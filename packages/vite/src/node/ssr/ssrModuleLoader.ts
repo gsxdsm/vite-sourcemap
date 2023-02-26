@@ -180,7 +180,19 @@ async function instantiateModule(
       }
     }
   }
-
+const { map } = result
+  if (map) {
+    if (mod.file) {
+      map.file = mod.file
+      if (map.mappings && !map.sourcesContent) {
+        await injectSourcesContent(map, mod.file, true)
+      }
+    }
+    result.code =
+      convertSourceMap.removeMapFileComments(result.code) +
+      '\n' +
+      convertSourceMap.fromObject(map).toComment()
+  }
   try {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     const AsyncFunction = async function () {}.constructor as typeof Function
